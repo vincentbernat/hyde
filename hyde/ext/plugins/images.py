@@ -176,6 +176,7 @@ def thumb(self, defaults={}, width=None, height=None):
                         "%s%s" % (defaults['prefix'],
                                   self.name))
     target = File(Folder(self.site.config.deploy_root_path).child(path))
+    target.parent.make()
     if self.name.endswith(".jpg"):
         im.save(target.path, "JPEG", optimize=True, quality=75)
     else:
