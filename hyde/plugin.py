@@ -90,12 +90,7 @@ class PluginProxy(object):
                                 plugin, 'should_call__' + method_name)
                             if checker(*args):
                                 function = getattr(plugin, method_name)
-                                try:
-                                    res = function(*args)
-                                except:
-                                    HydeException.reraise(
-                                        'Error occured when calling %s' %
-                                        plugin.plugin_name, sys.exc_info())
+                                res = function(*args)
                                 targs = list(args)
                                 if len(targs):
                                     last = targs.pop()
