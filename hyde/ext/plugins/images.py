@@ -122,10 +122,6 @@ class ImageSizerPlugin(PILPlugin):
         if not resource.source_file.kind == 'html':
             return
 
-        if mode.startswith('dev'):
-            self.logger.debug("Skipping sizer in development mode.")
-            return
-
         pos = 0                 # Position in text
         img = None              # Position of current img tag
         state = "find-img"
