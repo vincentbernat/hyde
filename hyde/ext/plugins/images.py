@@ -52,6 +52,19 @@ class ImageSizerPlugin(PILPlugin):
         super(ImageSizerPlugin, self).__init__(site)
         self.cache = {}
 
+    def _handle_img_size(self, image):
+        if image.source_file.kind not in ['png', 'jpg', 'jpeg', 'gif']:
+            self.logger.warn(
+                "[%s] has an img tag not linking to an image" % resource)
+            return (None, None)
+        # Now, get the size of the image
+        try:
+            return self.Image.open(image.path).size
+        except IOError:
+            self.logger.warn(
+                "Unable to process image [%s]" % image)
+            return (None, None)
+
     def _handle_img(self, resource, src, width, height):
         """Determine what should be added to an img tag"""
         if height is not None and width is not None:
@@ -82,18 +95,7 @@ class ImageSizerPlugin(PILPlugin):
                 self.logger.warn(
                     "[%s] has an unknown image" % resource)
                 return ""       # Nothing
-            if image.source_file.kind not in ['png', 'jpg', 'jpeg', 'gif']:
-                self.logger.warn(
-                    "[%s] has an img tag not linking to an image" % resource)
-                return ""       # Nothing
-            # Now, get the size of the image
-            try:
-                self.cache[src] = self.Image.open(image.path).size
-            except IOError:
-                self.logger.warn(
-                    "Unable to process image [%s]" % image)
-                self.cache[src] = (None, None)
-                return ""       # Nothing
+            self.cache[src] = self._handle_img_size(image)
             self.logger.debug("Image [%s] is %s" % (src,
                                                     self.cache[src]))
         new_width, new_height = self.cache[src]
