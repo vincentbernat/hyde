@@ -204,8 +204,7 @@ class HydeWebServer(HTTPServer):
         try:
             logger.debug('Serving resource [%s]' % resource)
             self.generator.generate_resource(resource, incremental=True)
-        except Exception as exception:
-            logger.error(
-                'Error [%s] occured when serving the resource [%s]'
-                % (repr(exception), resource))
-            logger.debug(traceback.format_exc())
+        except Exception:
+            logger.exception(
+                'Error occured when serving the resource [%s]'
+                % resource)
