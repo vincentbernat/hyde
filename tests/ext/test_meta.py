@@ -138,7 +138,7 @@ title: Even nicer title
         about2 = File(TEST_SITE.child('content/about2.html'))
         about2.write(text % d)
         meta = File(TEST_SITE.child('content/meta.yaml'))
-        meta.write(yaml.dump(d))
+        meta.write(yaml.safe_dump(d))
         s = Site(TEST_SITE)
         s.config.plugins = ['hyde.ext.plugins.meta.MetaPlugin']
         gen = Generator(s)
@@ -180,7 +180,7 @@ title: Even nicer title
         about2 = File(TEST_SITE.child('content/about2.html'))
         about2.write(text % d)
         meta = File(TEST_SITE.child('content/nodemeta.yaml'))
-        meta.write(yaml.dump(d))
+        meta.write(yaml.safe_dump(d))
         s = Site(TEST_SITE)
         s.config.plugins = ['hyde.ext.plugins.meta.MetaPlugin']
         s.config.meta = {
@@ -235,9 +235,9 @@ title: %(title)s
         about2 = File(TEST_SITE.child('content/blog/about2.html'))
         about2.write(text % page_d)
         content_meta = File(TEST_SITE.child('content/nodemeta.yaml'))
-        content_meta.write(yaml.dump(content_d))
+        content_meta.write(yaml.safe_dump(content_d))
         content_meta = File(TEST_SITE.child('content/blog/meta.yaml'))
-        content_meta.write(yaml.dump(blog_d))
+        content_meta.write(yaml.safe_dump(blog_d))
         s = Site(TEST_SITE)
         s.config.plugins = ['hyde.ext.plugins.meta.MetaPlugin']
         s.config.meta = site_d

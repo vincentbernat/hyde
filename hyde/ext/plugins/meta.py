@@ -399,7 +399,7 @@ class TaggerPlugin(Plugin):
         meta_text = u''
         if meta:
             import yaml
-            meta_text = yaml.dump(meta, default_flow_style=False)
+            meta_text = yaml.safe_dump(meta, default_flow_style=False)
 
         extension = config.get('extension', 'html')
         template = config['template']

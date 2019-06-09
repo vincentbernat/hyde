@@ -149,7 +149,7 @@ class Dependents(UserDict):
         Saves the dependency graph (just a dict for now).
         """
         if self.deps_file.parent.exists:
-            self.deps_file.write(yaml.dump(self.data))
+            self.deps_file.write(yaml.safe_dump(self.data))
 
 
 def _expand_path(sitepath, path):
