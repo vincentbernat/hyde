@@ -36,7 +36,7 @@ class TestUrlCleaner(object):
                     - html
                 append_slash: true
            """
-        s.config = Config(TEST_SITE, config_dict=yaml.load(cfg))
+        s.config = Config(TEST_SITE, config_dict=yaml.safe_load(cfg))
         text = """
    {% extends "base.html" %}
 
