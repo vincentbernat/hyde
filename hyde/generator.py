@@ -15,6 +15,7 @@ from contextlib import contextmanager
 from datetime import datetime
 from shutil import copymode
 import sys
+import os
 
 logger = getLoggerWithNullHandler('hyde.engine')
 
@@ -328,7 +329,7 @@ class Generator(object):
             target.parent.make()
             if resource.simple_copy:
                 logger.debug("Simply Copying [%s]", resource)
-                resource.source_file.copy_to(target)
+                os.symlink(resource.source_file.path, target.path)
             elif resource.source_file.is_text:
                 self.update_deps(resource)
                 if resource.uses_template:
