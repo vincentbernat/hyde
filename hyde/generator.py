@@ -329,6 +329,10 @@ class Generator(object):
             target.parent.make()
             if resource.simple_copy:
                 logger.debug("Simply Copying [%s]", resource)
+                try:
+                    os.unlink(target.path)
+                except OSError:
+                    pass
                 os.symlink(resource.source_file.path, target.path)
             elif resource.source_file.is_text:
                 self.update_deps(resource)
