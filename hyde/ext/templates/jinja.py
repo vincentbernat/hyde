@@ -711,6 +711,7 @@ class Jinja2Template(Template):
         settings['extensions'] = list()
         settings['extensions'].extend(default_extensions)
         settings['filters'] = {}
+        settings['functions'] = {}
         settings['tests'] = {}
 
         conf = {}
@@ -738,6 +739,15 @@ class Jinja2Template(Template):
                 module = __import__(module_name, fromlist=[function_name])
                 settings['filters'][name] = getattr(module, function_name)
 
+        functions = conf.get('functions', {})
+        if isinstance(functions, dict):
+            for name, value in functions.items():
+                parts = value.split('.')
+                module_name = '.'.join(parts[:-1])
+                function_name = parts[-1]
+                module = __import__(module_name, fromlist=[function_name])
+                settings['functions'][name] = getattr(module, function_name)
+
         tests = conf.get('tests', {})
         if isinstance(tests, dict):
             for name, value in tests.items():
@@ -759,6 +769,7 @@ class Jinja2Template(Template):
         self.env.globals['full_url'] = full_url
         self.env.globals['engine'] = engine
         self.env.globals['deps'] = {}
+        self.env.globals.update(settings['functions'])
         self.env.filters['urlencode'] = urlencode
         self.env.filters['urldecode'] = urldecode
         self.env.filters['asciidoc'] = asciidoc
