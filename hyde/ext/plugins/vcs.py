@@ -79,7 +79,7 @@ class GitDatesPlugin(VCSDatesPlugin):
                 "log",
                 "--pretty=%ai",
                 resource.path
-            ]).split("\n")
+            ]).decode('ascii').split("\n")
             commits = commits[:-1]
         except subprocess.CalledProcessError:
             self.logger.warning(
