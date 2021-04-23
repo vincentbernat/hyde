@@ -214,7 +214,7 @@ class TextlinksPlugin(Plugin):
     def __init__(self, site):
         super(TextlinksPlugin, self).__init__(site)
         import re
-        self.content_link = re.compile('\[\[([^\]^!][^\]]*)\]\]',
+        self.content_link = re.compile('\[\[([^\]^! ][^\]]*)\]\]',
                                        re.UNICODE | re.MULTILINE)
         self.media_link = re.compile('\[\[\!\!([^\]]*)\]\]',
                                      re.UNICODE | re.MULTILINE)
