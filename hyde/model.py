@@ -48,6 +48,12 @@ class Expando(object):
         """
         return iteritems(self.__dict__)
 
+    def __len__(self):
+        """
+        Return the number of attributes.
+        """
+        return len(self.__dict__)
+
     def update(self, d):
         """
         Updates the expando with a new dictionary
