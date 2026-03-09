@@ -72,27 +72,34 @@ class GitDatesPlugin(VCSDatesPlugin):
         """
         Retrieve dates from git
         """
-        # Run git log --pretty=%ai
         try:
-            commits = subprocess.check_output([
-                "git",
-                "log",
-                "--pretty=%ai",
-                resource.path
-            ]).decode('ascii').split("\n")
-            commits = commits[:-1]
+            # Get modified date from most recent commit only
+            modified_out = subprocess.check_output([
+                "git", "log", "-1", "--pretty=%at",
+                "--", resource.path
+            ]).decode('ascii').strip()
         except subprocess.CalledProcessError:
             self.logger.warning(
                 "Unable to get git history for [%s]" % resource)
-            commits = None
+            return None, None
 
-        if commits:
-            created = parse(commits[-1].strip())
-            modified = parse(commits[0].strip())
-        else:
+        if not modified_out:
             self.logger.warning("No git history for [%s]" % resource)
-            created, modified = None, None
+            return None, None
 
+        try:
+            # Get created date from the commit that first added the file
+            created_out = subprocess.check_output([
+                "git", "log", "--diff-filter=A", "--pretty=%at",
+                "--", resource.path
+            ]).decode('ascii').strip()
+            if not created_out:
+                created_out = modified_out
+        except subprocess.CalledProcessError:
+            created_out = modified_out
+
+        created = datetime.utcfromtimestamp(int(created_out))
+        modified = datetime.utcfromtimestamp(int(modified_out))
         return created, modified
 
 #
