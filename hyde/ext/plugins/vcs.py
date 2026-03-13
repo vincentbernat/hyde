@@ -7,6 +7,7 @@ from hyde.plugin import Plugin
 
 from datetime import datetime
 from dateutil.parser import parse
+from functools import cache
 import os.path
 import subprocess
 
@@ -72,28 +73,68 @@ class GitDatesPlugin(VCSDatesPlugin):
         """
         Retrieve dates from git
         """
-        # Run git log --pretty=%at
+        dates = self.get_all_dates(str(self.site.content.source_folder))
+        path = os.path.abspath(resource.path)
+        if path in dates:
+            return dates[path]
+
+        self.logger.warning("No git history for [%s]" % resource)
+        return None, None
+
+    @staticmethod
+    @cache
+    def get_all_dates(content_folder):
+        """
+        Run git log for the entire content folder and build a
+        dict mapping file paths to (created, modified) timestamps.
+        """
+        dates = {}  # path -> [first_seen_ts, last_seen_ts]
         try:
-            commits = subprocess.check_output([
-                "git",
-                "log",
-                "--pretty=%at",
-                resource.path
-            ]).decode('ascii').split("\n")
-            commits = commits[:-1]
+            output = subprocess.check_output([
+                "git", "log",
+                "--format=%at",
+                "--name-status",
+                "--no-merges",
+                "--diff-filter=AMR",
+                "--reverse",
+                content_folder
+            ]).decode('ascii')
         except subprocess.CalledProcessError:
-            self.logger.warning(
-                "Unable to get git history for [%s]" % resource)
-            commits = None
+            return {}
 
-        if commits:
-            created = datetime.utcfromtimestamp(int(commits[-1].strip()))
-            modified = datetime.utcfromtimestamp(int(commits[0].strip()))
-        else:
-            self.logger.warning("No git history for [%s]" % resource)
-            created, modified = None, None
+        current_ts = None
+        for line in output.split("\n"):
+            line = line.strip()
+            if not line:
+                continue
+            # Timestamp lines are purely numeric
+            if line.isdigit():
+                current_ts = int(line)
+                continue
+            if current_ts is None:
+                continue
+            # Name-status lines: "A\tpath" or "M\tpath" or "R100\told\tnew"
+            parts = line.split("\t")
+            if len(parts) < 2:
+                continue
+            status = parts[0]
+            if status.startswith("R"):
+                filepath = os.path.abspath(parts[2])
+            else:
+                filepath = os.path.abspath(parts[1])
+            if filepath not in dates:
+                dates[filepath] = [current_ts, current_ts]
+            else:
+                dates[filepath][1] = current_ts
 
-        return created, modified
+        # Convert to datetime pairs
+        result = {}
+        for filepath, (created_ts, modified_ts) in dates.items():
+            result[filepath] = (
+                datetime.utcfromtimestamp(created_ts),
+                datetime.utcfromtimestamp(modified_ts)
+            )
+        return result
 
 #
 # Mercurial Dates
