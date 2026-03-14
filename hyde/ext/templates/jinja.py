@@ -4,6 +4,7 @@ Jinja template utilties
 """
 
 from datetime import datetime, date
+import functools
 import itertools
 import os
 import re
@@ -804,6 +805,7 @@ class Jinja2Template(Template):
         if self.env.bytecode_cache:
             self.env.bytecode_cache.clear()
 
+    @functools.cache
     def get_dependencies(self, path):
         """
         Finds dependencies hierarchically based on the included
@@ -824,7 +826,7 @@ class Jinja2Template(Template):
             deps.append(dep)
             if dep:
                 deps.extend(self.get_dependencies(dep))
-        return list(set(deps))
+        return tuple(set(deps))
 
     @property
     def exception_class(self):
