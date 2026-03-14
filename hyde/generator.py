@@ -257,6 +257,8 @@ class Generator(object):
         self.load_template_if_needed()
         self.initialize()
         self.load_site_if_needed()
+        if incremental:
+            self.template.get_dependencies.cache_clear()
 
         try:
             with self.events_for(node):
@@ -292,6 +294,8 @@ class Generator(object):
         self.load_template_if_needed()
         self.initialize()
         self.load_site_if_needed()
+        if incremental:
+            self.template.get_dependencies.cache_clear()
 
         try:
             with self.events_for(resource):
