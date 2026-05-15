@@ -14,10 +14,59 @@ from hyde.site import Resource
 from contextlib import contextmanager
 from datetime import datetime
 from shutil import copymode
+import multiprocessing
 import sys
 import os
 
 logger = getLoggerWithNullHandler('hyde.engine')
+
+
+class ResourcePool(object):
+    """
+    Singleton process pool that runs *_resource_complete events in parallel.
+
+    Workers inherit the configured site (with plugins) via fork, so the
+    state lives on the class rather than being pickled per call. Worker
+    callables look up resources by relative path inside the child.
+    """
+
+    _instance = None
+    site = None
+    events = None
+
+    def __new__(cls, site):
+        if cls._instance is not None:
+            return cls._instance
+        workers = site.config.get('workers') or os.cpu_count() or 1
+        instance = super(ResourcePool, cls).__new__(cls)
+        cls.site = site
+        cls.events = Plugin.get_proxy(site)
+        ctx = multiprocessing.get_context('fork')
+        instance.pool = ctx.Pool(processes=workers)
+        cls._instance = instance
+        return instance
+
+    def text_complete(self, resource, text, target_path):
+        return self.pool.apply_async(
+            self.run_text_complete,
+            (resource.relative_path, text, target_path, resource.source_file.path))
+
+    def binary_complete(self, resource):
+        return self.pool.apply_async(
+            self.run_binary_complete,
+            (resource.relative_path,))
+
+    @classmethod
+    def run_text_complete(cls, rel_path, text, target_path, source_path):
+        resource = cls.site.content.resource_from_relative_path(rel_path)
+        text = cls.events.text_resource_complete(resource, text) or text
+        File(target_path).write(text)
+        copymode(source_path, target_path)
+
+    @classmethod
+    def run_binary_complete(cls, rel_path):
+        resource = cls.site.content.resource_from_relative_path(rel_path)
+        cls.events.binary_resource_complete(resource)
 
 
 class Generator(object):
@@ -299,7 +348,9 @@ class Generator(object):
 
         try:
             with self.events_for(resource):
-                self.__generate_resource__(resource, incremental)
+                result = self.__generate_resource__(resource, incremental)
+                if result is not None:
+                    result.get()
         except HydeException:
             self.generate_all()
 
@@ -314,18 +365,23 @@ class Generator(object):
         for node in node.walk():
             logger.debug("Generating Node [%s]", node)
             self.events.begin_node(node)
+            pending = []
             for resource in sorted(node.resources):
-                self.__generate_resource__(resource, incremental)
+                pending.append(
+                    self.__generate_resource__(resource, incremental))
+            for result in pending:
+                if result is not None:
+                    result.get()
             self.events.node_complete(node)
 
     def __generate_resource__(self, resource, incremental=False):
         self.refresh_config()
         if not resource.is_processable:
             logger.debug("Skipping [%s]", resource)
-            return
+            return None
         if incremental and not self.has_resource_changed(resource):
             logger.debug("No changes found. Skipping resource [%s]", resource)
-            return
+            return None
         logger.debug("Processing [%s]", resource)
         with self.context_for_resource(resource) as context:
             target = File(self.site.config.deploy_root_path.child(
@@ -338,6 +394,7 @@ class Generator(object):
                 except OSError:
                     pass
                 os.symlink(resource.source_file.path, target.path)
+                return None
             elif resource.source_file.is_text:
                 self.update_deps(resource)
                 if resource.uses_template:
@@ -355,12 +412,10 @@ class Generator(object):
                     text = self.events.begin_text_resource(
                         resource, text) or text
 
-                text = self.events.text_resource_complete(
-                    resource, text) or text
-                target.write(text)
-                copymode(resource.source_file.path, target.path)
+                return ResourcePool(self.site).text_complete(
+                    resource, text, target.path)
             else:
                 logger.debug("Copying binary file [%s]", resource)
                 self.events.begin_binary_resource(resource)
                 resource.source_file.copy_to(target)
-                self.events.binary_resource_complete(resource)
+                return ResourcePool(self.site).binary_complete(resource)
