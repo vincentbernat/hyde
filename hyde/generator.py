@@ -61,7 +61,7 @@ class ResourcePool(object):
         resource = cls.site.content.resource_from_relative_path(rel_path)
         text = cls.events.text_resource_complete(resource, text) or text
         File(target_path).write(text)
-        copymode(source_path, target_path)
+        os.chmod(target_path, 0o644, follow_symlinks=False)
 
     @classmethod
     def run_binary_complete(cls, rel_path):
@@ -418,4 +418,5 @@ class Generator(object):
                 logger.debug("Copying binary file [%s]", resource)
                 self.events.begin_binary_resource(resource)
                 resource.source_file.copy_to(target)
+                os.chmod(target.path, 0o644, follow_symlinks=False)
                 return ResourcePool(self.site).binary_complete(resource)
