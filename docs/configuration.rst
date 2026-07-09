@@ -125,7 +125,7 @@ Markdown
 
 Extensions and extension configuration for markdown can be configured in the
 ``markdown`` property. You can read about markdown extensions in the
-`Python-Markdown documentation <https://pythonhosted.org/Markdown/>`_.
+`Python-Markdown documentation <https://python-markdown.github.io/extensions/>`_.
 
-The following configuration will use the ``def_list``, ``tables``, ``headerid``
+The following configuration will use the ``def_list``, ``tables``, ``toc``
 extensions in Python-Markdown.

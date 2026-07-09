@@ -239,7 +239,7 @@ def test_markdown_with_extensions():
     t = Jinja2Template(JINJA2.path)
     s = Site(JINJA2.path)
     c = Config(JINJA2.path, config_dict=dict(
-        markdown=dict(extensions=['headerid'])))
+        markdown=dict(extensions=['toc'])))
     s.config = c
     t.configure(s)
     t.env.filters['dateformat'] = dateformat
@@ -264,14 +264,14 @@ See [Example][]
 
     expected = ("""
     <h1>Code</h1>
-<div class="codehilite"><pre><span></span><span class="k">def</span> """
-                """<span class="nf">add</span><span class="p">(</span>"""
+<div class="codehilite"><pre><span></span><code><span class="k">def</span>"""
+                """<span class="w"> </span><span class="nf">add</span>"""
+                """<span class="p">(</span>"""
                 """<span class="n">a</span><span class="p">,</span> """
                 """<span class="n">b</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">a</span> <span class="o">+"""
                 """</span> <span class="n">b</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>See <a href="example.html">Example</a></p>
     """)
@@ -295,7 +295,7 @@ def test_line_statements():
     t = Jinja2Template(JINJA2.path)
     s = Site(JINJA2.path)
     c = Config(JINJA2.path, config_dict=dict(
-        markdown=dict(extensions=['headerid'])))
+        markdown=dict(extensions=['toc'])))
     s.config = c
     t.configure(s)
     t.env.filters['dateformat'] = dateformat
@@ -313,7 +313,7 @@ def test_line_statements_with_config():
     config = """
     markdown:
         extensions:
-            - headerid
+            - toc
     jinja2:
         line_statement_prefix: '%%'
 
