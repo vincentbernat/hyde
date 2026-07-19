@@ -31,11 +31,11 @@ dependencies = [
     "commando>=1.0.0, <2.0",
     "PyYAML>=3.11",
     "Markdown>=3.10, <4.0",
-    "MarkupSafe>=0.23, <2.0",
+    "MarkupSafe>=2.0",
     "Pygments>=2.0.2, <3.0",
     "typogrify>=2.0.7, <3.0",
     "smartypants>=1.8.6, <2.0",
-    "Jinja2>=2.7.3, <3.0",
+    "Jinja2>=3.1.6, <4.0",
     # fswrap imports distutils, which is no longer in the standard library
     # setuptools provides a replacement
     "setuptools; python_version >= '3.12'",
