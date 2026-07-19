@@ -242,7 +242,7 @@ requires-dist = [
     { name = "pygments", specifier = ">=2.0.2,<3.0" },
     { name = "pyyaml", specifier = ">=3.11" },
     { name = "setuptools", marker = "python_full_version >= '3.12'" },
-    { name = "smartypants", specifier = ">=1.8.6,<2.0" },
+    { name = "smartypants", specifier = ">=2.0,<3.0" },
     { name = "typogrify", specifier = ">=2.0.7,<3.0" },
 ]
 
@@ -750,11 +750,11 @@ wheels = [
 
 [[package]]
 name = "smartypants"
-version = "1.8.6"
+version = "2.0.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/b9/5a/e7491c562a5be81da0a09972b24e1f564c326a1ff501d5907000a5b83dd8/smartypants-1.8.6.tar.gz", hash = "sha256:dcc206478e633b03e9abfeb7512a0acf90191cb4b38d251e05468ef063386512", size = 13287, upload-time = "2014-07-19T11:21:50.61Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6c/8f/a033f78196d9467b402d100ec40b95166d43fa2642693f23f771473d8195/smartypants-2.0.2.tar.gz", hash = "sha256:39d64ce1d7cc6964b698297bdf391bc12c3251b7f608e6e55d857cd7c5f800c6", size = 16392, upload-time = "2025-06-17T07:59:48.122Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/96/d7/3503fac52e97455d0b62ba489a2eae4bd3e952ce9c36b0c840cb3a23adf8/smartypants-1.8.6-py2.py3-none-any.whl", hash = "sha256:fd840fd1144c6959a5d0578531d7f2b4efb134f7ce00cf60380c89402d36ff1d", size = 10189, upload-time = "2014-07-19T11:21:56.696Z" },
+    { url = "https://files.pythonhosted.org/packages/39/2c/f12558bff677defbfc64bf32441daec245df608dd2d9a12168f1d766ad75/smartypants-2.0.2-py2.py3-none-any.whl", hash = "sha256:9471578606e8ee0740065bf8771f55fec8c83313cb98c5d1c1864ddd389d0f3a", size = 10168, upload-time = "2025-06-17T07:59:46.765Z" },
 ]
 
 [[package]]

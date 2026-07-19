@@ -34,7 +34,7 @@ dependencies = [
     "MarkupSafe>=2.0",
     "Pygments>=2.0.2, <3.0",
     "typogrify>=2.0.7, <3.0",
-    "smartypants>=1.8.6, <2.0",
+    "smartypants>=2.0, <3.0",
     "Jinja2>=3.1.6, <4.0",
     # fswrap imports distutils, which is no longer in the standard library
     # setuptools provides a replacement
