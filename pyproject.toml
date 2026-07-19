@@ -1,0 +1,80 @@
+[project]
+name = "hyde"
+version = "0.9.0"
+description = "hyde is a static website generator"
+readme = "README.rst"
+license = "MIT"
+authors = [
+    { name = "hyde developers", email = "hyde-dev@googlegroups.com" },
+]
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Unix",
+    "Operating System :: POSIX",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Internet",
+    "Topic :: Internet :: WWW/HTTP :: Site Management",
+]
+dependencies = [
+    "fswrap>=1.0.0, <2.0",
+    "commando>=1.0.0, <2.0",
+    "PyYAML>=3.11",
+    "Markdown>=3.10, <4.0",
+    "MarkupSafe>=0.23, <2.0",
+    "Pygments>=2.0.2, <3.0",
+    "typogrify>=2.0.7, <3.0",
+    "smartypants>=1.8.6, <2.0",
+    "Jinja2>=2.7.3, <3.0",
+    # fswrap imports distutils, which is no longer in the standard library
+    # setuptools provides a replacement
+    "setuptools; python_version >= '3.12'",
+]
+
+[project.urls]
+Homepage = "http://hyde.github.io"
+
+[project.scripts]
+hyde = "hyde.main:main"
+
+[tool.uv]
+default-groups = []
+
+[dependency-groups]
+# The "dev" group is broken.
+dev = [
+    "coverage>=4.0.3, <5.0",
+    "pyquery>=1.2.9, <2.0",
+    "docutils>=0.12, <1.0",
+    "mock>=1.0.1, <2.0",
+    "nose>=1.3.6, <2.0",
+    "Pillow>=2.7.0, <3.0",
+    "pyScss>=1.3.4, <2.0",
+    "libsass>=0.8.2, <1.0",
+    "flake8>=2.4.1, <3.0",
+]
+docs = [
+    "doc8",
+    "sphinx",
+    "sphinxcontrib-napoleon",
+    "sphinx_rtd_theme",
+]
+
+[build-system]
+requires = ["uv_build>=0.11,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
+source-exclude = ["**/.mypy_cache/**", "**/*\\~"]
+wheel-exclude = ["**/.mypy_cache/**", "**/*\\~"]

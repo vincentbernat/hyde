@@ -1,11 +1,11 @@
 Requirements
 ============
 
-All the python requirements are enumerated in dev-req.txt. You can install them
-with:
+All the python requirements are enumerated in the ``dev`` dependency group of
+pyproject.toml. You can install them with:
 
 ::
-    pip install -r dev-req.txt
+    uv sync --group dev
 
 
 Apart from these requirements the following are required by plugins if you
