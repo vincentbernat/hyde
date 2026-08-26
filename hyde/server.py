@@ -94,6 +94,13 @@ class HydeRequestHandler(SimpleHTTPRequestHandler):
             res.relative_deploy_path)
         return new_path
 
+    def log_request(self, *args, **kwargs):
+        """
+        Logs the request unless the server runs in silent mode.
+        """
+        if not self.server.silent:
+            SimpleHTTPRequestHandler.log_request(self, *args, **kwargs)
+
     def do_404(self):
         """
         Sends a 'not found' response.
@@ -132,8 +139,9 @@ class HydeWebServer(HTTPServer):
     a request is issued.
     """
 
-    def __init__(self, site, address, port):
+    def __init__(self, site, address, port, silent=False):
         self.site = site
+        self.silent = silent
         self.site.load()
         self.generator = Generator(self.site)
         self.request_time = datetime.strptime('1-1-1999', '%m-%d-%Y')
