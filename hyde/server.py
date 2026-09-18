@@ -63,36 +63,35 @@ class HydeRequestHandler(SimpleHTTPRequestHandler):
         logger.debug(
             "Trying to load file based on request: [%s]" % result.path)
         path = result.path.lstrip('/')
+        extensions = []
+        if hasattr(site.config, 'urlcleaner'):
+            extensions = getattr(
+                site.config.urlcleaner, 'strip_extensions', [])
+        candidates = ['%s.%s' % (path, ext) for ext in extensions]
         res = None
-        if path.strip() == "" or File(path).kind.strip() == "":
-            deployed = site.config.deploy_root_path.child(path)
-            deployed = Folder.file_or_folder(deployed)
-            if isinstance(deployed, Folder):
-                node = site.content.node_from_relative_path(path)
+        deployed = Folder.file_or_folder(
+            site.config.deploy_root_path.child(path))
+        if isinstance(deployed, Folder):
+            node = site.content.node_from_relative_path(path)
+            if node:
                 res = node.get_resource('index.html')
-            elif hasattr(site.config, 'urlcleaner') and hasattr(
-                    site.config.urlcleaner, 'strip_extensions'):
-                for ext in site.config.urlcleaner.strip_extensions:
-                    res = site.content.resource_from_relative_deploy_path(
-                        path + '.' + ext)
-                    if res:
-                        break
-                for ext in site.config.urlcleaner.strip_extensions:
-                    new_path = site.config.deploy_root_path.child(
-                        path + '.' + ext)
-                    if File(new_path).exists:
-                        return new_path
         else:
-            res = site.content.resource_from_relative_deploy_path(path)
+            for candidate in candidates + [path]:
+                res = site.content.resource_from_relative_deploy_path(
+                    candidate)
+                if res:
+                    break
 
         if not res:
+            # Some deployed files have no matching resource.
+            for candidate in candidates:
+                new_path = site.config.deploy_root_path.child(candidate)
+                if File(new_path).exists:
+                    return new_path
             logger.error("Cannot load file: [%s]" % path)
             return site.config.deploy_root_path.child(path)
-        else:
-            self.server.generate_resource(res)
-        new_path = site.config.deploy_root_path.child(
-            res.relative_deploy_path)
-        return new_path
+        self.server.generate_resource(res)
+        return site.config.deploy_root_path.child(res.relative_deploy_path)
 
     def log_request(self, *args, **kwargs):
         """
